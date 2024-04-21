@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameFramework/Character.h"
+#include "Settings/AlsInputActions.h"
 #include "State/AlsLocomotionState.h"
 #include "State/AlsMantlingState.h"
 #include "State/AlsMovementBaseState.h"
@@ -32,6 +33,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character")
 	TObjectPtr<UAlsMovementSettings> MovementSettings;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character")
+	FAlsInputActions InputActions;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Als Character|Desired State",
 		ReplicatedUsing = "OnReplicated_DesiredAiming")
@@ -576,6 +580,23 @@ private:
 	FVector RagdollTraceGround(bool& bGrounded) const;
 
 	void LimitRagdollSpeed() const;
+
+	// EnhancedInput
+
+public:
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE FVector2D GetMoveActionValue() const { return InputActions.GetMoveInputValue(); }
+
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE void GetMoveInputValue(float& OutMoveForward, float& OutMoveRight) const {
+		auto&& MoveAction = GetMoveActionValue();
+		OutMoveForward = MoveAction.Y;
+		OutMoveRight = MoveAction.X;
+	}
+
+	// Swimming System
+public:
+
 
 	// Debug
 

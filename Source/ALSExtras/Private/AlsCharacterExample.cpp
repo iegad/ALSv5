@@ -23,7 +23,7 @@ void AAlsCharacterExample::NotifyControllerChanged()
 		auto* InputSubsystem{ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PreviousPlayer->GetLocalPlayer())};
 		if (IsValid(InputSubsystem))
 		{
-			InputSubsystem->RemoveMappingContext(InputMappingContext);
+			InputSubsystem->RemoveMappingContext(InputActions.InputMappingContext);
 		}
 	}
 
@@ -40,7 +40,7 @@ void AAlsCharacterExample::NotifyControllerChanged()
 			FModifyContextOptions Options;
 			Options.bNotifyUserSettings = true;
 
-			InputSubsystem->AddMappingContext(InputMappingContext, 0, Options);
+			InputSubsystem->AddMappingContext(InputActions.InputMappingContext, 0, Options);
 		}
 	}
 
@@ -65,19 +65,21 @@ void AAlsCharacterExample::SetupPlayerInputComponent(UInputComponent* Input)
 	auto* EnhancedInput{Cast<UEnhancedInputComponent>(Input)};
 	if (IsValid(EnhancedInput))
 	{
-		EnhancedInput->BindAction(LookMouseAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnLookMouse);
-		EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnLook);
-		EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnMove);
-		EnhancedInput->BindAction(SprintAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnSprint);
-		EnhancedInput->BindAction(WalkAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnWalk);
-		EnhancedInput->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnCrouch);
-		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnJump);
-		EnhancedInput->BindAction(AimAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnAim);
-		EnhancedInput->BindAction(RagdollAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnRagdoll);
-		EnhancedInput->BindAction(RollAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnRoll);
-		EnhancedInput->BindAction(RotationModeAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnRotationMode);
-		EnhancedInput->BindAction(ViewModeAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnViewMode);
-		EnhancedInput->BindAction(SwitchShoulderAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnSwitchShoulder);
+		EnhancedInput->BindAction(InputActions.LookMouseAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnLookMouse);
+		EnhancedInput->BindAction(InputActions.LookAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnLook);
+		EnhancedInput->BindAction(InputActions.MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnMove);
+		EnhancedInput->BindAction(InputActions.SprintAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnSprint);
+		EnhancedInput->BindAction(InputActions.WalkAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnWalk);
+		EnhancedInput->BindAction(InputActions.CrouchAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnCrouch);
+		EnhancedInput->BindAction(InputActions.JumpAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnJump);
+		EnhancedInput->BindAction(InputActions.AimAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnAim);
+		EnhancedInput->BindAction(InputActions.RagdollAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnRagdoll);
+		EnhancedInput->BindAction(InputActions.RollAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnRoll);
+		EnhancedInput->BindAction(InputActions.RotationModeAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnRotationMode);
+		EnhancedInput->BindAction(InputActions.ViewModeAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnViewMode);
+		EnhancedInput->BindAction(InputActions.SwitchShoulderAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnSwitchShoulder);
+
+		InputActions.SetMoveInputValue(EnhancedInput->BindActionValue(InputActions.MoveAction));
 	}
 }
 
@@ -85,16 +87,16 @@ void AAlsCharacterExample::Input_OnLookMouse(const FInputActionValue& ActionValu
 {
 	const auto Value{ActionValue.Get<FVector2D>()};
 
-	AddControllerPitchInput(Value.Y * LookUpMouseSensitivity);
-	AddControllerYawInput(Value.X * LookRightMouseSensitivity);
+	AddControllerPitchInput(Value.Y * InputActions.LookUpMouseSensitivity);
+	AddControllerYawInput(Value.X * InputActions.LookRightMouseSensitivity);
 }
 
 void AAlsCharacterExample::Input_OnLook(const FInputActionValue& ActionValue)
 {
 	const auto Value{ActionValue.Get<FVector2D>()};
 
-	AddControllerPitchInput(Value.Y * LookUpRate);
-	AddControllerYawInput(Value.X * LookRightRate);
+	AddControllerPitchInput(Value.Y * InputActions.LookUpRate);
+	AddControllerYawInput(Value.X * InputActions.LookRightRate);
 }
 
 void AAlsCharacterExample::Input_OnMove(const FInputActionValue& ActionValue)
