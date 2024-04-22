@@ -26,6 +26,7 @@ AAlsWater::AAlsWater() : Super() {
 	SurfaceResponse.SetResponse(ECollisionChannel::ECC_Bubbles, ECollisionResponse::ECR_Ignore);
 	SurfaceResponse.SetResponse(ECollisionChannel::ECC_Rope, ECollisionResponse::ECR_Block);
 	SurfaceResponse.SetResponse(ECollisionChannel::ECC_Beam, ECollisionResponse::ECR_Block);
+	SurfaceResponse.SetResponse(ECollisionChannel::ECC_TraceWater, ECollisionResponse::ECR_Block);
 	Surface->SetCollisionResponseToChannels(SurfaceResponse);
 
 	Box = CreateDefaultSubobject<UBoxComponent>(FName{ TEXTVIEW("Box") });
@@ -47,6 +48,7 @@ AAlsWater::AAlsWater() : Super() {
 	BoxResponse.SetResponse(ECollisionChannel::ECC_Bubbles, ECollisionResponse::ECR_Ignore);
 	BoxResponse.SetResponse(ECollisionChannel::ECC_Rope, ECollisionResponse::ECR_Block);
 	BoxResponse.SetResponse(ECollisionChannel::ECC_Beam, ECollisionResponse::ECR_Block);
+	BoxResponse.SetResponse(ECollisionChannel::ECC_TraceWater, ECollisionResponse::ECR_Block);
 	Box->SetCollisionResponseToChannels(BoxResponse);
 
 	PostProcess = CreateDefaultSubobject<UPostProcessComponent>(FName{ TEXTVIEW("PostProcess") });
@@ -55,6 +57,12 @@ AAlsWater::AAlsWater() : Super() {
 	PostProcess->BlendRadius = 1.f;
 
 	FPostProcessSettings PostProcessSettings;
+	PostProcessSettings.bOverride_WhiteTemp = 1;
+	PostProcessSettings.bOverride_WhiteTint = 1;
+	PostProcessSettings.bOverride_ColorSaturation = 1;
+	PostProcessSettings.bOverride_ColorGain = 1;
+	PostProcessSettings.bOverride_ColorGamma = 1;
+	PostProcessSettings.bOverride_ColorContrast = 1;
 	PostProcessSettings.WhiteTemp = 4875.001465;
 	PostProcessSettings.WhiteTint = 0.64;
 	PostProcessSettings.FilmSlope = 0.533333;

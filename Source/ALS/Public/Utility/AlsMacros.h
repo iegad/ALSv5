@@ -67,6 +67,8 @@ namespace AlsEnsure
 #define ECC_Beam ECC_GameTraceChannel2
 #define ECC_Rope ECC_GameTraceChannel3
 #define ECC_Bubbles ECC_GameTraceChannel4
+#define ECC_Water ECC_GameTraceChannel5
+#define ECC_TraceWater ECC_GameTraceChannel6
 
 template<typename T, typename T2 = T> inline void
 SetValue(T& dst, const T2& src) {
