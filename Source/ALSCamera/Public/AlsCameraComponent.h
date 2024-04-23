@@ -120,7 +120,7 @@ private:
 	float CalculateFovOffset() const;
 
 	FVector CalculateCameraTrace(const FVector& CameraTargetLocation, const FVector& PivotOffset,
-	                             float DeltaTime, bool bAllowLag, float& NewTraceDistanceRatio) const;
+	                             float DeltaTime, bool bAllowLag, float& NewTraceDistanceRatio);
 
 	bool TryAdjustLocationBlockedByGeometry(FVector& Location, bool bDisplayDebugCameraTraces) const;
 

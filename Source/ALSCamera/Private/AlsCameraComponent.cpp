@@ -8,6 +8,8 @@
 #include "Utility/AlsCameraConstants.h"
 #include "Utility/AlsMacros.h"
 #include "Utility/AlsUtility.h"
+#include <Kismet/KismetMathLibrary.h>
+#include <AlsCharacter.h>
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AlsCameraComponent)
 
@@ -444,7 +446,7 @@ float UAlsCameraComponent::CalculateFovOffset() const
 }
 
 FVector UAlsCameraComponent::CalculateCameraTrace(const FVector& CameraTargetLocation, const FVector& PivotOffset,
-                                                  const float DeltaTime, const bool bAllowLag, float& NewTraceDistanceRatio) const
+                                                  const float DeltaTime, const bool bAllowLag, float& NewTraceDistanceRatio)
 {
 #if ENABLE_DRAW_DEBUG
 	const auto bDisplayDebugCameraTraces{
@@ -490,6 +492,22 @@ FVector UAlsCameraComponent::CalculateCameraTrace(const FVector& CameraTargetLoc
 			}
 		}
 	}
+
+	if (Character->IsPlayerControlled() && Hit.IsValidBlockingHit()) {
+		auto&& SelfNormal = GetComponentTransform().GetRotation().GetForwardVector();
+		auto HitAngle = UKismetMathLibrary::DegAcos(FVector::DotProduct(Hit.ImpactNormal, SelfNormal));
+		auto LeftSide = FVector::CrossProduct({ Hit.ImpactNormal.X, Hit.ImpactNormal.Y, 0 }, { SelfNormal.X, SelfNormal.Y, 0 });
+		if (HitAngle >= 30 && HitAngle <= 120) {
+			if (LeftSide.Z > 0 && IsRightShoulder()) {
+				SetRightShoulder(false);
+			}
+			else if (LeftSide.Z < 0 && !IsRightShoulder()) {
+				SetRightShoulder(true);
+			}
+		}
+	}
+
+
 
 #if ENABLE_DRAW_DEBUG
 	if (bDisplayDebugCameraTraces)
