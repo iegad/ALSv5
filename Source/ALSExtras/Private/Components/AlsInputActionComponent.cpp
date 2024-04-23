@@ -8,57 +8,6 @@
 UAlsInputActionComponent::UAlsInputActionComponent() {
 }
 
-void 
-UAlsInputActionComponent::SetupEnhancedInput(class UEnhancedInputComponent* EnhancedInput) {
-	Character = Cast<AAlsCharacter>(GetOwner());
-	if (!IsValid(Character)) {
-		XERROR("Character is invalid");
-		return;
-	}
-
-	const auto* PreviousPlayer{ Cast<APlayerController>(Character->PreviousController) };
-	if (IsValid(PreviousPlayer))
-	{
-		auto* InputSubsystem{ ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PreviousPlayer->GetLocalPlayer()) };
-		if (IsValid(InputSubsystem))
-		{
-			InputSubsystem->RemoveMappingContext(Character->GetInputActions().InputMappingContext);
-		}
-	}
-
-	auto* NewPlayer{ Cast<APlayerController>(Character->GetController()) };
-	if (IsValid(NewPlayer))
-	{
-		NewPlayer->InputYawScale_DEPRECATED = 1.0f;
-		NewPlayer->InputPitchScale_DEPRECATED = 1.0f;
-		NewPlayer->InputRollScale_DEPRECATED = 1.0f;
-
-		auto* InputSubsystem{ ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(NewPlayer->GetLocalPlayer()) };
-		if (IsValid(InputSubsystem))
-		{
-			FModifyContextOptions Options;
-			Options.bNotifyUserSettings = true;
-
-			InputSubsystem->AddMappingContext(Character->GetInputActions().InputMappingContext, 0, Options);
-		}
-	}
-
-	EnhancedInput->BindAction(Character->GetInputActions().LookMouseAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnLookMouse);
-	EnhancedInput->BindAction(Character->GetInputActions().LookAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnLook);
-	EnhancedInput->BindAction(Character->GetInputActions().MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnMove);
-	EnhancedInput->BindAction(Character->GetInputActions().SprintAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnSprint);
-	EnhancedInput->BindAction(Character->GetInputActions().WalkAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnWalk);
-	EnhancedInput->BindAction(Character->GetInputActions().CrouchAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnCrouch);
-	EnhancedInput->BindAction(Character->GetInputActions().JumpAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnJump);
-	EnhancedInput->BindAction(Character->GetInputActions().AimAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnAim);
-	EnhancedInput->BindAction(Character->GetInputActions().RagdollAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnRagdoll);
-	EnhancedInput->BindAction(Character->GetInputActions().RollAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnRoll);
-	EnhancedInput->BindAction(Character->GetInputActions().RotationModeAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnRotationMode);
-	EnhancedInput->BindAction(Character->GetInputActions().ViewModeAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnViewMode);
-
-	Character->GetInputActions().SetMoveInputValue(EnhancedInput->BindActionValue(Character->GetInputActions().MoveAction));
-}
-
 void
 UAlsInputActionComponent::Input_OnLookMouse(const FInputActionValue& ActionValue) {
 	const auto Value{ ActionValue.Get<FVector2D>() };
@@ -162,4 +111,56 @@ UAlsInputActionComponent::Input_OnRotationMode() {
 void
 UAlsInputActionComponent::Input_OnViewMode() {
 	Character->SetViewMode(Character->GetViewMode() == AlsViewModeTags::ThirdPerson ? AlsViewModeTags::FirstPerson : AlsViewModeTags::ThirdPerson);
+}
+
+void 
+UAlsInputActionComponent::BeginPlay() {
+	Super::BeginPlay();
+
+	Character = Cast<AAlsCharacter>(GetOwner());
+	if (!IsValid(Character)) {
+		XERROR("Character is invalid");
+		return;
+	}
+
+	auto* NewPlayer{ Cast<APlayerController>(Character->GetController()) };
+	if (!IsValid(NewPlayer)) {
+		XERROR("PlayerController is invalid");
+		return;
+	}
+
+	NewPlayer->InputYawScale_DEPRECATED = 1.0f;
+	NewPlayer->InputPitchScale_DEPRECATED = 1.0f;
+	NewPlayer->InputRollScale_DEPRECATED = 1.0f;
+
+	auto* InputSubsystem{ ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(NewPlayer->GetLocalPlayer()) };
+	if (!IsValid(InputSubsystem)) {
+		XERROR("EnhancedInputLocalPlayerSubsystem is invalid");
+		return;
+	}
+
+	FModifyContextOptions Options;
+	Options.bNotifyUserSettings = true;
+	InputSubsystem->AddMappingContext(Character->GetInputActions().InputMappingContext, 0, Options);
+
+	auto* EnhancedInput = Character->FindComponentByClass<UEnhancedInputComponent>();
+	if (!IsValid(EnhancedInput)) {
+		XERROR("EnhancedInputComponent is invalid");
+		return;
+	}
+
+	EnhancedInput->BindAction(Character->GetInputActions().LookMouseAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnLookMouse);
+	EnhancedInput->BindAction(Character->GetInputActions().LookAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnLook);
+	EnhancedInput->BindAction(Character->GetInputActions().MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnMove);
+	EnhancedInput->BindAction(Character->GetInputActions().SprintAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnSprint);
+	EnhancedInput->BindAction(Character->GetInputActions().WalkAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnWalk);
+	EnhancedInput->BindAction(Character->GetInputActions().CrouchAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnCrouch);
+	EnhancedInput->BindAction(Character->GetInputActions().JumpAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnJump);
+	EnhancedInput->BindAction(Character->GetInputActions().AimAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnAim);
+	EnhancedInput->BindAction(Character->GetInputActions().RagdollAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnRagdoll);
+	EnhancedInput->BindAction(Character->GetInputActions().RollAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnRoll);
+	EnhancedInput->BindAction(Character->GetInputActions().RotationModeAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnRotationMode);
+	EnhancedInput->BindAction(Character->GetInputActions().ViewModeAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnViewMode);
+
+	Character->GetInputActions().SetMoveInputValue(EnhancedInput->BindActionValue(Character->GetInputActions().MoveAction));
 }

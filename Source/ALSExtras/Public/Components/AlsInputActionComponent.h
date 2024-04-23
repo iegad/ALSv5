@@ -13,9 +13,6 @@ public:
 	UAlsInputActionComponent();
 
 	UFUNCTION(BlueprintCallable)
-	void SetupEnhancedInput(class UEnhancedInputComponent* EnhancedInput);
-
-	UFUNCTION(BlueprintCallable)
 	void Input_OnLookMouse(const FInputActionValue& ActionValue);
 
 	UFUNCTION(BlueprintCallable)
@@ -50,6 +47,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void Input_OnViewMode();
+
+protected:
+	virtual void BeginPlay() override;
 
 private:
 	TObjectPtr<AAlsCharacter> Character;
