@@ -129,6 +129,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void CalcCamera(float DeltaTime, FMinimalViewInfo& ViewInfo) override;
+
 public:
 	virtual void PostNetReceiveLocationAndRotation() override;
 
@@ -139,6 +141,10 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 
 	virtual void Restart() override;
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "Als Character", Meta = (ReturnDisplayName = "Handled"))
+	bool OnCalculateCamera(float DeltaTime, FMinimalViewInfo& ViewInfo);
 
 private:
 	void RefreshMeshProperties() const;
@@ -587,11 +593,6 @@ public:
 		OutMoveForward = MoveAction.Y;
 		OutMoveRight = MoveAction.X;
 	}
-
-	FORCEINLINE FAlsInputActions& GetInputActions() { return InputActions; }
-
-	// Camera
-public:
 
 	// Swimming System
 public:
