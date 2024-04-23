@@ -97,6 +97,9 @@ public:
 	                                                   float Radius, float HalfHeight, bool bHit, const FHitResult& Hit,
 	                                                   const FLinearColor& SweepColor, const FLinearColor& HitColor,
 	                                                   float Duration = 0.0f, float Thickness = 1.0f, uint8 DepthPriority = 0);
+
+	UFUNCTION(BlueprintCallable, Category = "Als|Normal")
+	static bool IsOnLeft(const FVector& NormalA, const FVector& NormalB, bool IgnoreZ = false);
 };
 
 constexpr FStringView UAlsUtility::BoolToString(const bool bValue)

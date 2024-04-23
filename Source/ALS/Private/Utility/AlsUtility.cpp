@@ -427,3 +427,12 @@ void UAlsUtility::DrawDebugSweepSingleCapsuleAlternative(const UObject* WorldCon
 	}
 #endif
 }
+
+bool 
+UAlsUtility::IsOnLeft(const FVector& NormalA, const FVector& NormalB, bool IgnoreZ) {
+	if (IgnoreZ) {
+		return FVector::CrossProduct({ NormalA.X, NormalA.Y, 0.f }, { NormalB.X, NormalB.Y, 0.f }).Z < 0;
+	}
+
+	return FVector::CrossProduct(NormalA, NormalB).Z < 0;
+}
