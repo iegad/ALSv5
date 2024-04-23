@@ -594,6 +594,8 @@ public:
 		OutMoveRight = MoveAction.X;
 	}
 
+	FORCEINLINE FAlsInputActions& GetInputActions() { return InputActions; }
+
 	// Swimming System
 public:
 
