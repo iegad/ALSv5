@@ -77,6 +77,15 @@ public:
 		return MoveActionValue ? MoveActionValue->GetValue().Get<FVector2D>() : FVector2D::ZeroVector;
 	}
 
+	inline void SetLookActionValue(FEnhancedInputActionValueBinding& InLookActionValue) {
+		LookActionValue = &InLookActionValue;
+	}
+
+	inline FVector2D GetLookInputValue() const {
+		return LookActionValue ? LookActionValue->GetValue().Get<FVector2D>() : FVector2D::ZeroVector;
+	}
+
 private:
 	FEnhancedInputActionValueBinding* MoveActionValue{ nullptr };
+	FEnhancedInputActionValueBinding* LookActionValue{ nullptr };
 };

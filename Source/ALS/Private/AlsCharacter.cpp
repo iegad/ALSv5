@@ -479,14 +479,22 @@ void AAlsCharacter::OnMovementModeChanged(const EMovementMode PreviousMovementMo
 		case MOVE_Walking:
 		case MOVE_NavWalking:
 			SetLocomotionMode(AlsLocomotionModeTags::Grounded);
+			SetDesiredRotationMode(AlsRotationModeTags::ViewDirection);
 			break;
 
 		case MOVE_Falling:
 			SetLocomotionMode(AlsLocomotionModeTags::InAir);
+			SetDesiredRotationMode(AlsRotationModeTags::ViewDirection);
+			break;
+
+		case MOVE_Swimming:
+			SetLocomotionMode(AlsLocomotionModeTags::InWater);
+			SetDesiredRotationMode(AlsRotationModeTags::VelocityDirection);
 			break;
 
 		default:
 			SetLocomotionMode(FGameplayTag::EmptyTag);
+			SetDesiredRotationMode(AlsRotationModeTags::ViewDirection);
 			break;
 	}
 
@@ -1495,7 +1503,7 @@ void AAlsCharacter::CharacterMovement_OnPhysicsRotation(const float DeltaTime)
 
 void AAlsCharacter::RefreshGroundedRotation(const float DeltaTime)
 {
-	if (LocomotionAction.IsValid() || LocomotionMode != AlsLocomotionModeTags::Grounded)
+	if (LocomotionAction.IsValid() || (LocomotionMode != AlsLocomotionModeTags::Grounded && LocomotionMode != AlsLocomotionModeTags::InWater))
 	{
 		return;
 	}
@@ -1530,7 +1538,6 @@ void AAlsCharacter::RefreshGroundedRotation(const float DeltaTime)
 
 			static constexpr auto RotationInterpolationSpeed{12.0f};
 			static constexpr auto TargetYawAngleRotationSpeed{800.0f};
-
 			RefreshRotationExtraSmooth(TargetYawAngle, DeltaTime, RotationInterpolationSpeed, TargetYawAngleRotationSpeed);
 			return;
 		}

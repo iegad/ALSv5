@@ -136,7 +136,7 @@ void AAlsCharacter::RefreshRollingPhysics(const float DeltaTime)
 
 bool AAlsCharacter::StartMantlingGrounded()
 {
-	return LocomotionMode == AlsLocomotionModeTags::Grounded &&
+	return (LocomotionMode == AlsLocomotionModeTags::Grounded || LocomotionMode == AlsLocomotionModeTags::InWater) &&
 	       StartMantling(Settings->Mantling.GroundedTrace);
 }
 

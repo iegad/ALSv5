@@ -22,14 +22,13 @@ public:
 
 	virtual void NotifyControllerChanged() override;
 
-	// Camera
-
 protected:
+	virtual void Tick(float InDeltaTime) override;
+
+	// Camera
 	virtual void CalcCamera(float DeltaTime, FMinimalViewInfo& ViewInfo) override;
 
 	// Input
-
-protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* Input) override;
 
 private:
@@ -63,4 +62,7 @@ private:
 
 public:
 	virtual void DisplayDebug(UCanvas* Canvas, const FDebugDisplayInfo& DisplayInfo, float& Unused, float& VerticalLocation) override;
+
+private:
+	bool SwimmingUp = false;
 };

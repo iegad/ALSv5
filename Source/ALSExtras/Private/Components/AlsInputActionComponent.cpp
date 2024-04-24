@@ -3,6 +3,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Utility/AlsMath.h"
 
 UAlsInputActionComponent::UAlsInputActionComponent() {
@@ -28,9 +29,10 @@ void
 UAlsInputActionComponent::Input_OnMove(const FInputActionValue& ActionValue) {
 	const auto Value{ UAlsMath::ClampMagnitude012D(ActionValue.Get<FVector2D>()) };
 
-	const auto ForwardDirection{ UAlsMath::AngleToDirectionXY(UE_REAL_TO_FLOAT(Character->GetViewState().Rotation.Yaw)) };
-	const auto RightDirection{ UAlsMath::PerpendicularCounterClockwiseXY(ForwardDirection) };
+	const auto ForwardDirection = CharacterMovement->MovementMode == MOVE_Swimming ?
+		Character->GetViewRotation().Vector() : UAlsMath::AngleToDirectionXY(static_cast<float>(Character->GetViewRotation().Yaw));
 
+	const auto RightDirection{ UAlsMath::PerpendicularCounterClockwiseXY(ForwardDirection) };
 	Character->AddMovementInput(ForwardDirection * Value.Y + RightDirection * Value.X);
 }
 
@@ -67,6 +69,11 @@ UAlsInputActionComponent::Input_OnJump(const FInputActionValue& ActionValue) {
 		}
 
 		if (Character->StartMantlingGrounded()) {
+			return;
+		}
+
+		if (CharacterMovement->MovementMode == MOVE_Swimming) {
+			Character->AddMovementInput(Character->GetActorUpVector(), 1.f);
 			return;
 		}
 
@@ -123,6 +130,12 @@ UAlsInputActionComponent::BeginPlay() {
 		return;
 	}
 
+	CharacterMovement = Character->GetCharacterMovement();
+	if (!IsValid(CharacterMovement)) {
+		XERROR("CharacterMovement is invalid");
+		return;
+	}
+
 	auto* NewPlayer{ Cast<APlayerController>(Character->GetController()) };
 	if (!IsValid(NewPlayer)) {
 		XERROR("PlayerController is invalid");
@@ -163,4 +176,5 @@ UAlsInputActionComponent::BeginPlay() {
 	EnhancedInput->BindAction(Character->GetInputActions().ViewModeAction, ETriggerEvent::Triggered, this, &ThisClass::Input_OnViewMode);
 
 	Character->GetInputActions().SetMoveInputValue(EnhancedInput->BindActionValue(Character->GetInputActions().MoveAction));
+	Character->GetInputActions().SetLookActionValue(EnhancedInput->BindActionValue(Character->GetInputActions().LookMouseAction));
 }

@@ -588,11 +588,7 @@ public:
 	FORCEINLINE FVector2D GetMoveActionValue() const { return InputActions.GetMoveInputValue(); }
 
 	UFUNCTION(BlueprintPure)
-	FORCEINLINE void GetMoveInputValue(float& OutMoveForward, float& OutMoveRight) const {
-		auto&& MoveAction = GetMoveActionValue();
-		OutMoveForward = MoveAction.Y;
-		OutMoveRight = MoveAction.X;
-	}
+	FORCEINLINE FVector2D GetLookInputValue() const { return InputActions.GetLookInputValue(); }
 
 	FORCEINLINE FAlsInputActions& GetInputActions() { return InputActions; }
 

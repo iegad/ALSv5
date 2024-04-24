@@ -53,4 +53,5 @@ protected:
 
 private:
 	TObjectPtr<AAlsCharacter> Character;
+	TObjectPtr<UCharacterMovementComponent> CharacterMovement;
 };

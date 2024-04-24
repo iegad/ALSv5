@@ -1,10 +1,12 @@
 #include "AlsCharacterExample.h"
 
 #include "AlsCameraComponent.h"
+#include "Engine/LocalPlayer.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "Engine/LocalPlayer.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AlsCharacterExample)
 
@@ -45,6 +47,37 @@ void AAlsCharacterExample::NotifyControllerChanged()
 	}
 
 	Super::NotifyControllerChanged();
+}
+
+void 
+AAlsCharacterExample::Tick(float InDeltaTime) {
+	Super::Tick(InDeltaTime);
+
+	if (IsPlayerControlled()) {
+		auto&& FeetTraceStart = GetMesh()->GetSocketLocation(TEXT("root")) + GetActorUpVector() * 10.f;
+		auto&& FeetTraceEnd = GetMesh()->GetSocketLocation(TEXT("root")) + GetActorUpVector() * -10.f;
+		FHitResult LandResult;
+		UKismetSystemLibrary::LineTraceSingle(GetWorld(), FeetTraceStart, FeetTraceEnd,
+			UEngineTypes::ConvertToTraceType(ECC_Visibility), true, {}, EDrawDebugTrace::ForOneFrame, LandResult, true);
+		if (LandResult.bBlockingHit) {
+			if (GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Swimming) {
+				GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+				return;
+			}
+		} 
+		
+		auto&& WaterTraceStart = GetMesh()->GetSocketLocation(TEXT("WaterTracer"));
+		FHitResult WaterResult;
+		UKismetSystemLibrary::SphereTraceSingle(GetWorld(), WaterTraceStart, WaterTraceStart, 5.f,
+			UEngineTypes::ConvertToTraceType(ECC_TraceWater), true, {}, EDrawDebugTrace::ForOneFrame, WaterResult, true);
+
+		SetValue(SwimmingUp, WaterResult.bBlockingHit);
+		if (WaterResult.bBlockingHit) {
+			if (GetCharacterMovement()->MovementMode != EMovementMode::MOVE_Swimming) {
+				GetCharacterMovement()->SetMovementMode(MOVE_Swimming);
+			}
+		}
+	}
 }
 
 void AAlsCharacterExample::CalcCamera(const float DeltaTime, FMinimalViewInfo& ViewInfo)
@@ -149,6 +182,11 @@ void AAlsCharacterExample::Input_OnJump(const FInputActionValue& ActionValue)
 
 		if (StartMantlingGrounded())
 		{
+			return;
+		}
+
+		if (GetCharacterMovement()->MovementMode == MOVE_Swimming && SwimmingUp) {
+			AddMovementInput(GetActorUpVector());
 			return;
 		}
 
