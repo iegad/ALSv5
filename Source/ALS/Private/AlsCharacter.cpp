@@ -479,22 +479,18 @@ void AAlsCharacter::OnMovementModeChanged(const EMovementMode PreviousMovementMo
 		case MOVE_Walking:
 		case MOVE_NavWalking:
 			SetLocomotionMode(AlsLocomotionModeTags::Grounded);
-			SetDesiredRotationMode(AlsRotationModeTags::ViewDirection);
 			break;
 
 		case MOVE_Falling:
 			SetLocomotionMode(AlsLocomotionModeTags::InAir);
-			SetDesiredRotationMode(AlsRotationModeTags::ViewDirection);
 			break;
 
 		case MOVE_Swimming:
 			SetLocomotionMode(AlsLocomotionModeTags::InWater);
-			SetDesiredRotationMode(AlsRotationModeTags::VelocityDirection);
 			break;
 
 		default:
 			SetLocomotionMode(FGameplayTag::EmptyTag);
-			SetDesiredRotationMode(AlsRotationModeTags::ViewDirection);
 			break;
 	}
 
